@@ -5,10 +5,16 @@ from os import makedirs
 from openpyxl import load_workbook
 
 def getTwoFieldTyping(cell=None, locus=None):
-    print('\nCell:' + str(cell))
+    #print('\nCell:' + str(cell))
     cellType=cell.data_type
-    print('Type:' + str(cellType))
-    print('Value:' + str(cell.value))
+    #print('Type:' + str(cellType))
+    #print('Value:' + str(cell.value))
+
+    # Strange case in the data input
+    if(cell.value == '07:02+L117:X124:01'):
+        print('Random Case. I found this text:' + str(cell.value))
+        twoFieldTyping='C*07:02'
+        return twoFieldTyping
 
 
     if cell.is_date:
@@ -33,7 +39,7 @@ def getTwoFieldTyping(cell=None, locus=None):
         rawTyping=cell.value
         #
 
-    print('raw typing:' + str(rawTyping))
+    #print('raw typing:' + str(rawTyping))
 
 
 
@@ -49,7 +55,7 @@ def getTwoFieldTyping(cell=None, locus=None):
                     print ('converting (' + nomenclatureToken + ') to (0' + nomenclatureToken + ')' )
                     nomenclatureTokens[tokenIndex] = '0' + nomenclatureTokens[tokenIndex]
             twofieldTyping = str(locus) + '*' + nomenclatureTokens[0] + ':' + nomenclatureTokens[1]
-            print('returning ' + str(twofieldTyping))
+            #print('returning ' + str(twofieldTyping))
             return twofieldTyping
         else:
             raise Exception('Cannot find a 2 field typing in this string:' + str(rawTyping))
@@ -62,6 +68,7 @@ def parseExcelForFamilyData(outputFileName=None, excelFileName=None, headers=Tru
 
         excelData = load_workbook(excelFileName)
 
+        '''
         idColumn='B'
         a1Column='C'
         a2Column='D'
@@ -73,6 +80,18 @@ def parseExcelForFamilyData(outputFileName=None, excelFileName=None, headers=Tru
         drb12Column='J'
         dqb11Column='K'
         dqb12Column='L'
+        '''
+        idColumn='A'
+        a1Column='B'
+        a2Column='C'
+        b1Column='D'
+        b2Column='E'
+        c1Column='F'
+        c2Column='G'
+        drb11Column='H'
+        drb12Column='I'
+        dqb11Column='J'
+        dqb12Column='K'
 
 
         firstSheet = excelData[excelData.sheetnames[0]]
@@ -81,11 +100,16 @@ def parseExcelForFamilyData(outputFileName=None, excelFileName=None, headers=Tru
         else:
             startRowIndex = 1
 
+        # For debugging. This will break some things.
+        lastRowIndex=162
 
-        for rowIndexRaw, row in enumerate(firstSheet.iter_rows(min_row=startRowIndex, values_only=True)):
+
+
+        for rowIndexRaw, row in enumerate(firstSheet.iter_rows(min_row=startRowIndex, max_row=lastRowIndex, values_only=True)):
             print('Row:' + str(row))
 
-            if(str(row)=='(None, None, None, None, None, None, None, None, None, None, None, None, None)'):
+            # Trim out nonsense, if there is nothing left than this was an empty cell.
+            if(str(row).replace('None','').replace('(','').replace(')','').replace(',','').replace('\'','').replace(' ','')==''):
                 #print('That was a None Row')
                 outputFile.write(separator + newLine)
 
