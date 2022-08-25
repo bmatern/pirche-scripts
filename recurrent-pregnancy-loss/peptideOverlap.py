@@ -4,7 +4,7 @@ from os.path import isdir, join
 from os import makedirs
 
 
-def readPeptideFile(peptideFileName=None, delimiter=','):
+def readPeptideFile(peptideFileName=None, delimiter=';'):
     print('Reading Peptides from (' + str(peptideFileName) + ")")
     with open(peptideFileName, 'r') as peptideFile:
         peptideDataLines = peptideFile.readlines()
@@ -70,7 +70,7 @@ def calculateOverlap(immunizerHeaders=None, immunizerPeptides=None, recallHeader
     return overlapHeaders, overlapPeptides
 
 
-def writeOutput(overlapHeaders=None, overlapPeptides=None, outputFileName=None, delimiter=',', newline='\r\n'):
+def writeOutput(overlapHeaders=None, overlapPeptides=None, outputFileName=None, delimiter=';', newline='\r\n'):
     print('Writing file ' + str(outputFileName))
 
     # Calculate the maximum length of the peptide lists, to use for iteration
